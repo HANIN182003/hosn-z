@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>حصن Z</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+<style>
+body { font-family: 'Tajawal', sans-serif; background: linear-gradient(135deg,#dfefff,#e6f4ec); color:#333; margin:0; padding:0 0 60px 0; text-align:center; direction:rtl; }
+header { background-color:#8e44ad; color:#fff; padding:15px; font-size:26px; font-weight:bold; letter-spacing:2px; position:relative; }
+nav { display:flex; flex-wrap:wrap; justify-content:center; margin:10px 0; }
+nav button { margin:10px; padding:12px 24px; background:#30b89b; color:#fff; border:none; border-radius:30px; cursor:pointer; font-size:18px; transition:all 0.3s ease; }
+nav button:hover { background:#55d6b8; transform:scale(1.1); }
+h1,h2,h3 { color:#8e44ad; }
+.section { display:none; margin:20px; animation:fadeIn 0.5s ease; }
+.active { display:block; }
+.logo-main { width:250px; height:250px; margin:40px auto; background-size:contain; background-repeat:no-repeat; background-position:center; }
+iframe, video { border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.3); }
+.games-container { display:flex; flex-wrap:wrap; justify-content:center; gap:25px; margin-top:20px; }
+.game-card { background: rgba(255,255,255,0.6); padding:15px; border-radius:15px; width:30%; box-shadow:0 4px 15px rgba(0,0,0,0.3); transition:transform 0.3s ease; }
+.game-card:hover { transform:scale(1.05); }
+.game-card img { width:70%; margin:0 auto 10px; display:block; border:3px solid #000; box-shadow:0 4px 15px rgba(0,0,0,0.2); }
+.game-card a { display:inline-block; margin-top:10px; padding:10px 20px; background:#30b89b; color:#fff; border-radius:25px; text-decoration:none; transition:0.3s; }
+.game-card a:hover { background:#55d6b8; transform:scale(1.05); }
+.popup { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%) scale(0.5); background:#ffeb3b; color:#000; padding:20px 30px; border-radius:15px; font-weight:bold; box-shadow:0 8px 25px rgba(0,0,0,0.4); opacity:0; transition:all 0.3s ease-in-out; z-index:1000; cursor:pointer; }
+.popup.show { opacity:1; transform:translate(-50%,-50%) scale(1); animation:shake 0.4s ease; }
+@keyframes shake { 0%{transform:translate(-50%,-50%) scale(0.8) rotate(-5deg);} 50%{transform:translate(-50%,-50%) scale(1.1) rotate(5deg);} 100%{transform:translate(-50%,-50%) scale(1) rotate(0);} }
+@keyframes fadeIn { from{opacity:0; transform:translateY(10px);} to{opacity:1;} }
+
+/* الفيديوهات */
+.videos-container { display:flex; flex-direction: column; align-items: center;  gap:30px; }
+.local-video { width:55%; margin: 0 auto; }
+.local-video video { width:100%; height:315px; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,0.15); }
+.local-video h3 { margin-bottom:10px; }
+
+/* بودكاست */
+#podcast .local-video { width:60%; margin:0 auto 20px; }
+
+/* نتيجة الرابط */
+#analysisResult { margin-top:15px; font-weight:bold; text-align:right; padding:15px; border-radius:12px; border:2px solid #8e44ad; background:#d4edda; word-wrap:break-word; }
+
+/* quiz */
+#quiz-container { max-width:600px; margin:0 auto; text-align:right; }
+.quiz-question { margin-bottom:15px; text-align:right; }
+.quiz-question button { margin:5px; padding:8px 16px; border:none; border-radius:12px; background:#30b89b; color:#fff; cursor:pointer; transition:0.3s; }
+.quiz-question button:hover { background:#55d6b8; }
+.quiz-question button.correct { background-color:#28a745 !important; color:#fff; }
+.quiz-question button.wrong { background-color:#dc3545 !important; color:#fff; }
+
+/* حقوق الملكية */
+.footer { background-color:#8e44ad; color:#fff; text-align:center; padding: 6px 12px; font-size:16px; font-weight:bold; position:fixed; bottom:0; left:0; width:100%; z-index:999; box-shadow:0 -2px 10px rgba(0,0,0,0.2); }
+
+/* زر الوضع الليلي على اليسار */
+#darkToggle { 
+    position: absolute; 
+    left: 15px; 
+    top: 50%; 
+    transform: translateY(-50%); 
+    padding:4px 6px; 
+    border: none; 
+    border-radius: 4px; 
+    cursor: pointer; 
+    font-size: 12px; 
+    background: #30b89b; 
+    color: #fff; 
+    transition: 0.3s; 
+}
+#darkToggle:hover { background: #55d6b8; }
+
+/* الوضع الليلي */
+body.dark-mode {
+    background: #121212;
+    color: #e0e0e0;
+}
+body.dark-mode header { background-color: #222; color: #fff; }
+body.dark-mode nav button { background: #555; color: #fff; }
+body.dark-mode nav button:hover { background: #777; }
+body.dark-mode .game-card { background: rgba(50,50,50,0.7); box-shadow: 0 4px 15px rgba(0,0,0,0.6); }
+body.dark-mode #analysisResult { background: #333; color: #fff; border: 2px solid #fff; }
+body.dark-mode .popup { background: #ffeb3b; color: #000; }
+#ending .local-video {
+    width: 50%;        /* نفس عرض البودكاست */
+    margin: 0 auto 20px; /* مركزي مع مسافة تحت كل فيديو */
+}
+
+</style>
+</head>
+<body>
+
+<header>
+<span>حصن <span style="color:#ffeb3b;">Z</span></span>
+<!-- زر الوضع الليلي -->
+<button id="darkToggle" onclick="toggleDark()">🌙</button>
+</header>
+
+<nav>
+  <button onclick="showSection('home')">الصفحة الرئيسية</button>
+  <button onclick="showSection('about')">من نحن</button>
+  <button onclick="showSection('videos')">الفيديوهات</button>
+  <button onclick="showSection('games')">الألعاب</button>
+  <button onclick="showSection('ending')">محاكاة رقمية</button>
+  <button onclick="showSection('check-link')">تحقق من الرابط</button>
+  <button onclick="showSection('podcast')">🎙️ بودكاست منصة حصن Z</button>
+  <button onclick="showSection('quiz')">📝 اختبر وعيك</button>
+  <button onclick="showSection('contact')">تواصل معنا</button>
+</nav>
+
+
+<div id="home" class="section active">
+<h1>أهلاً بك في منصة حُصن <span style="color:#ffeb3b;">Z</span> 🚀</h1>
+<p>هنا نتعرف على المخاطر بطريقة ممتعة، نلعب ألعاب تعليمية، ونشاهد فيديوهات تساعدك تبني درعك الرقمي 🛡️</p>
+<div class="logo-main">
+<img src="..\media\لوقو حصن 2.png" alt="لوقو حُصن Z" style="width:250px;height:250px;">
+</div>
+</div>
+
+<div id="about" class="section">
+<h2>من نحن</h2>
+<p>منصة حُصن Z يهدف إلى رفع الوعي المجتمعي ويقلل البلاغات الناتجة عن الجهل التقني, ويتماشى مع التحول الرقمي ورؤية 2030 .</p>
+</div>
+
+<div id="videos" class="section">
+<h2>📹 الفيديوهات التوعوية</h2>
+<div class="videos-container">
+<div class="local-video">
+<h3>🎬 حماية من مخاطرالإنترنت</h3>
+<video controls>
+<source src="..\media\مخاطر الانترنت.mp4" type="video/mp4">
+</video>
+</div>
+<div class="local-video">
+<h3>🎥 مخاطر تحديات "الهبه"</h3>
+<video controls>
+<source src="../media\video6019398048323475587.mp4">
+</video>
+</div>
+<div class="local-video">
+<h3>🎥 شرح مفصل لل URL</h3>
+<video controls>
+<source src="..\media\WhatsApp Video 2026-01-03 at 10.13.23 PM.mp4" type="video/mp4">
+</video>
+</div>
+<div class="local-video">
+<h3>🎥 تجربة عبدالعزيز</h3>
+<video controls>
+<source src="..\media\document_5985697205183322554.mp4" type="video/mp4">
+</video>
+</div>
+<div class="local-video">
+<h3>🎥 كيف تعرف إذا كان جهازك مخترق؟</h3>
+<video controls>
+<source src="..\media\IMG_2744.MP4" type="video/mp4">
+</video>
+</div>
+<div class="local-video">
+<h3>🎥 كيف تفعل المصادقة الثنائية؟</h3>
+<video controls>
+<source src="..\media\0Download.mp4" type="video/mp4">
+</video>
+</div>
+</div>
+<div class="local-video">
+<h3>🎥 منصة كلنا أمن</h3>
+<video controls>
+<source src="..\media\فيديو كلنا امن.mp4" type="video/mp4">
+</video>
+</div>
+</div>
+<div id="games" class="section">
+<h2>🎮 الألعاب</h2>
+<div class="games-container">
+<div class="game-card">
+<img src="../media\photo_5985457378960721948_y.jpg" alt="5985457378960721948.jpg">
+<h3>لعبة صيد الروابط المشبوهة</h3>
+<a href="https://wordwall.net/ar/resource/99647817" target="_blank">ابدأ اللعب</a>
+</div>
+<div class="game-card">
+<img src="..\media\ChatGPT Image 5 أكتوبر 2025، 11_04_55 ص.png" alt="ChatGPT Image">
+<h3>لعبة صيد التنمر الإلكتروني</h3>
+<a href="https://wordwall.net/resource/97825461" target="_blank">ابدأ اللعب</a>
+</div>
+<div class="game-card">
+<img src="..\media\ChatGPT Image 24 نوفمبر 2025، 09_32_22 ص.png" alt="لعبة البازل">
+<h3>🧩 لعبة البازل التعليمية</h3>
+<a href="https://wordwall.net/ar/resource/12345678" target="_blank">ابدأ اللعب</a>
+</div>
+</div>
+</div>
+
+<div id="check-link" class="section">
+<h2>🛡️ تحقق من الرابط</h2>
+<p>أدخل الرابط للتأكد من أمانه قبل الضغط 👇</p>
+<input type="text" id="linkInput" placeholder="ألصق الرابط هنا..." style="width:60%;padding:12px;border-radius:10px;border:1px solid #ccc;">
+<br><br>
+<button onclick="analyzeLink()" style="padding:12px 25px;background:#30b89b;color:#fff;border:none;border-radius:25px;font-size:18px;cursor:pointer;">تحقق 🔍</button>
+<div id="analysisResult" style="display:none;"></div>
+</div>
+
+<div id="podcast" class="section">
+<h2>🎙️ بودكاست منصة حصن Z</h2>
+<div class="videos-container">
+<div class="local-video">
+<h3>🎧 الحلقة1:قصة ندى</h3>
+<video controls>
+<source src="..\media\حنين النهائي.mp4" type="video/mp4">
+</video>
+</div>
+<div class="local-video">
+<h3>🎧 الحلقة 2: قصة جود</h3>
+<video controls>
+<source src="..\media\هاجر ب ساوند.mp4" type="video/mp4">
+</video>
+</div>
+<div class="local-video">
+<h3>🎧 الحلقة 3: قصة الفتاة الضحية</h3>
+<video controls>
+<source src="..\media\افنان النهائي (1).mp4" type="video/mp4">
+</video>
+</div>
+</div>
+</div>
+
+<div id="ending" class="section">
+<h2>🎬 محاكاة رقمية</h2>
+<p>
+يعرض هذا القسم قصصًا واقعية ومحاكاة تعليمية بهدف التوعية الرقمية،
+وجميع المحتويات آمنة ولا تتضمن أي ممارسات ضارة.
+</p>
+
+<div class="videos-container">
+<div class="local-video">
+<h3>🎥 محاكاة اختراق وهمية</h3>
+<video controls>
+<source src="..\media\WhatsApp Video 2026-01-04 at 1.51.09 AM.mp4"type="video/mp4">
+</video>
+</div>
+
+<div class="local-video">
+<h3>🎥تجربة عبدالعزيز</h3>
+<video controls>
+<source src="..\media\document_5985697205183322554.mp4" type="video/mp4">
+</video>
+</div>
+
+</div>
+</div>
+
+
+</div>
+</div>
+<div id="quiz" class="section">
+<h2>📝 اختبر وعيك</h2>
+<p>أجب على الأسئلة التالية لتعرف مدى وعيك بالمخاطر الرقمية:</p>
+<div id="quiz-container">
+<div class="quiz-question" data-correct="false">
+<p>1️⃣ هل يجب مشاركة كلمة المرور مع صديق مقرب؟</p>
+<button data-answer="true" onclick="selectAnswer(this)">نعم</button>
+<button data-answer="false" onclick="selectAnswer(this)">لا</button>
+</div>
+<div class="quiz-question" data-correct="false">
+<p>2️⃣ هل يجب الضغط على رابط غير معروف في رسالة مشبوهة؟</p>
+<button data-answer="true" onclick="selectAnswer(this)">نعم</button>
+<button data-answer="false" onclick="selectAnswer(this)">لا</button>
+</div>
+<div class="quiz-question" data-correct="true">
+<p>3️⃣ هل من الجيد تفعيل المصادقة الثنائية على حساباتك؟</p>
+<button data-answer="true" onclick="selectAnswer(this)">نعم</button>
+<button data-answer="false" onclick="selectAnswer(this)">لا</button>
+</div>
+<div class="quiz-question" data-correct="false">
+<p>4️⃣ هل من الآمن استخدام نفس كلمة المرور لكل الحسابات؟</p>
+<button data-answer="true" onclick="selectAnswer(this)">نعم</button>
+<button data-answer="false" onclick="selectAnswer(this)">لا</button>
+</div>
+<div class="quiz-question" data-correct="true">
+<p>5️⃣ هل من الأفضل التحقق من الروابط قبل الضغط عليها؟</p>
+<button data-answer="true" onclick="selectAnswer(this)">نعم</button>
+<button data-answer="false" onclick="selectAnswer(this)">لا</button>
+</div>
+<div id="quiz-result" style="margin-top:15px;font-weight:bold;font-size:18px;text-align:center;"></div>
+<div id="final-feedback" style="margin-top:10px;font-size:18px;font-weight:bold;color:#8e44ad;text-align:center;"></div>
+<button id="restartQuizBtn" style="margin-top:10px; display:none; padding:8px 16px; font-size:16px; border:none; border-radius:12px; background:#30b89b; color:#fff; cursor:pointer;" onclick="restartQuiz()">إعادة الاختبار</button>
+</div>
+</div>
+
+<div id="contact" class="section">
+<h2>📩 تواصل معنا</h2>
+<p>يمكنك التواصل عبر البريد الإلكتروني:</p>
+<p><a href="mailto:hosnzhah@outlook.com">hosnzhah@outlook.com</a></p>
+</div>
+
+<div id="popup" class="popup" onclick="hidePopup()"></div>
+
+<!-- عداد الزيارات -->
+<div id="visit-counter" style="position: fixed; bottom:35px; left:10px; background:#8e44ad; color:#fff; padding:10px 16px; border-radius:20px; font-weight:bold; box-shadow:0 4px 10px rgba(0,0,0,0.3); font-size:12px; z-index:1000; text-align:left;">
+👁️ عدد الزيارات: <span id="visitCount">0</span>
+</div>
+
+<footer class="footer">
+جميع الحقوق محفوظة لمنصة حُصن Z، وحقوق المحتوى المرئي والفيديوهات لأصحابها الأصليين.
+</footer>
+
+<script>
+function showSection(sectionId){
+document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+document.getElementById(sectionId).classList.add('active');
+let message="";
+if(sectionId==="about") message="⚠️ لا تشارك معلوماتك الشخصية مع الغرباء!";
+else if(sectionId==="videos") message="⚠️ لا تضغط على روابط مشبوهة في التعليقات أو الرسائل!";
+else if(sectionId==="games") message="⚠️ تذكر أن الألعاب للتسلية والتعليم معاً";
+else if(sectionId==="check-link") message="⚠️ تأكد من الرابط قبل الضغط عليه لحماية نفسك من الاحتيال.";
+else if(sectionId==="podcast") message="⚠️ استمع جيدًا وتعلّم كيف تحمي نفسك رقميًا.";
+else if(sectionId==="contact") message="⚠️ لا تشارك معلومات حساسة عبر البريد الإلكتروني.";
+else if(sectionId==="ending") message="⚠️ تذكّر: الوعي هو أقوى سلاحك ضد المخاطر الرقمية!";
+else if(sectionId==="quiz") message="⚠️ جاوب بتركيز… كل سؤال يعلمك مهارة رقمية مهمّة!";
+if(message) showPopup(message);
+}
+function showPopup(msg){const p=document.getElementById("popup");p.innerText=msg;p.classList.add("show");setTimeout(hidePopup,5000);}
+function hidePopup(){document.getElementById("popup").classList.remove("show");}
+
+async function analyzeLink() {
+    const input = document.getElementById("linkInput").value.trim();
+    const result = document.getElementById("analysisResult");
+
+    if (!input) {
+        result.style.display = "block";
+        result.style.background = "#fff3cd";
+        result.style.border = "2px solid #ffeb3b";
+        result.innerHTML = "⚠️ الرجاء إدخال رابط أولاً.";
+        return;
+    }
+
+    result.style.display = "block";
+    result.style.background = "#d4edda";
+    result.style.border = "2px solid #8e44ad";
+    result.innerHTML = "⏳ جاري جلب عنوان الـ IP...";
+
+    try {
+        const res = await fetch("https://api.ipify.org?format=json");
+        const data = await res.json();
+        const userIP = data.ip;
+
+        const issues = [];
+        let color = "#d4edda";
+        let title = "✅ الرابط يبدو آمنًا.";
+        const domainMatch = input.match(/:\/\/(www\.)?([^\/]+)/);
+        const domain = domainMatch ? domainMatch[2] : "غير معروف";
+
+        if (!input.startsWith("https://")) {
+            issues.push("🚫 لا يستخدم HTTPS (غير مشفر)");
+            color = "#f8d7da";
+            title = "❌ الرابط غير آمن!";
+        }
+
+        if (input.length > 80) {
+            issues.push("⚠️ الرابط طويل جدًا، قد يكون مريباً.");
+            color = "#fff3cd";
+            title = "⚠️ الرابط يحتاج فحص إضافي.";
+        }
+
+        ["login","free","secure","password","bank","gift","verify"].forEach(word => {
+            if (input.toLowerCase().includes(word)) {
+                issues.push(`⚠️ يحتوي على كلمة مشبوهة: "${word}"`);
+                color = "#fff3cd";
+                title = "⚠️ الرابط قد يكون مريباً.";
+            }
+        });
+
+        result.style.background = color;
+        result.style.border = "2px solid #8e44ad";
+        result.innerHTML = `
+<strong>${title}</strong><br>
+🌐 النطاق: <b>${domain}</b><br>
+${issues.length ? issues.join("<br>") : "👍 لم يتم العثور على مشاكل واضحة."}<br>
+🖥️ عنوان الـ IP الخاص بك: <b>${userIP}</b>
+`;
+    } catch {
+        result.style.background = "#f8d7da";
+        result.style.border = "2px solid #8e44ad";
+        result.innerHTML = "❌ حدث خطأ ولم نستطع جلب عنوان الـ IP.";
+    }
+}
+
+
+function updateVisitCounter(){ let visits=localStorage.getItem('hosnZ_visits'); visits=!visits?1:parseInt(visits)+1; localStorage.setItem('hosnZ_visits',visits); document.getElementById('visitCount').textContent=visits; }
+window.onload=updateVisitCounter;
+
+// quiz
+let score=0; let answered=0;
+function selectAnswer(btn){
+const question=btn.parentElement; if(question.classList.contains('answered')) return; question.classList.add('answered');
+const correct=question.getAttribute('data-correct')==='true'; const selected=btn.getAttribute('data-answer')==='true';
+if(selected===correct) { btn.classList.add('correct'); score++; } else { btn.classList.add('wrong'); question.querySelectorAll('button').forEach(b=>{ if(b.getAttribute('data-answer')===question.getAttribute('data-correct')) b.classList.add('correct'); }); }
+answered++; if(answered===5){ document.getElementById('quiz-result').innerText=`🎉 انتهيت! لقد أجبت على ${score} من 5 أسئلة.`; const feedback=document.getElementById('final-feedback'); if(score>=4) feedback.innerText="✅ رائع! أنت واعٍ سيبراني 💪"; else if(score===3) feedback.innerText="⚠️ جيد، لكن تحتاج إلى توعية أكثر"; else feedback.innerText="🔴 تحتاج لمراجعة الموقع وتعزيز وعيك الرقمي"; document.getElementById('restartQuizBtn').style.display='inline-block'; }
+}
+function restartQuiz(){ score=0; answered=0; document.getElementById('quiz-result').innerText=''; document.getElementById('final-feedback').innerText=''; document.getElementById('restartQuizBtn').style.display='none'; document.querySelectorAll('#quiz .quiz-question').forEach(q=>{ q.classList.remove('answered'); q.querySelectorAll('button').forEach(b=>b.classList.remove('correct','wrong')); }); }
+
+// الوضع الليلي
+function toggleDark() { document.body.classList.toggle('dark-mode'); }
+
+</script>
+</body>
+</html>
